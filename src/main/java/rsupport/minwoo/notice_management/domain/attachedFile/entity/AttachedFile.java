@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -31,7 +32,20 @@ public class AttachedFile extends BaseEntity {
     @Comment("제목")
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     @Comment("파일 경로")
     private String filePath;
+
+    @Column(nullable = false, length = 30)
+    @Comment("파일 타입")
+    private String type;
+
+    @Builder
+    private AttachedFile(Long id, Notice notice, String title, String filePath, String type) {
+        this.id = id;
+        this.notice = notice;
+        this.title = title;
+        this.filePath = filePath;
+        this.type = type;
+    }
 }
