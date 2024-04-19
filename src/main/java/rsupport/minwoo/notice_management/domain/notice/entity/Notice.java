@@ -15,9 +15,12 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Comment;
 import rsupport.minwoo.notice_management.domain.attachedFile.entity.AttachedFile;
 import rsupport.minwoo.notice_management.domain.member.entity.Member;
+import rsupport.minwoo.notice_management.domain.notice.dto.request.UpdateNoticeRequest;
 import rsupport.minwoo.notice_management.global.base.BaseEntity;
 
 @Entity
@@ -45,15 +48,16 @@ public class Notice extends BaseEntity {
     @Comment("종료 일시")
     private LocalDateTime endDateTime;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     @Comment("조회수")
     private long views;
 
     @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false, updatable = false)
     private Member member;
 
     @OneToMany(mappedBy = "notice", orphanRemoval = true)
+    @Cascade(CascadeType.PERSIST)
     private List<AttachedFile> fileList = new ArrayList<>();
 
     @Builder
@@ -68,7 +72,22 @@ public class Notice extends BaseEntity {
         this.member = member;
     }
 
+    public void addAttachedFile(AttachedFile attachedFile) {
+        fileList.add(attachedFile);
+    }
+
+    public void removeAllAttachedFile() {
+        this.fileList.clear();
+    }
+
     public void addView() {
         this.views++;
+    }
+
+    public void update(UpdateNoticeRequest request) {
+        this.title = request.getTitle();
+        this.content = request.getContent();
+        this.startDateTime = request.getStartDateTime();
+        this.endDateTime = request.getEndDateTime();
     }
 }
