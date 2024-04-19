@@ -60,4 +60,8 @@ public class Notice extends BaseEntity {
         this.views = 0;
         this.member = member;
     }
+
+    public void addView() {
+        this.views++;
+    }
 }

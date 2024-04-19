@@ -1,4 +1,4 @@
-package rsupport.minwoo.notice_management.domain.notice.dto;
+package rsupport.minwoo.notice_management.domain.notice.dto.request;
 
 import java.time.LocalDateTime;
 import lombok.Getter;
