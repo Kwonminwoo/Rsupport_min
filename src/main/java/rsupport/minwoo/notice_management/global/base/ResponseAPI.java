@@ -1,8 +1,10 @@
 package rsupport.minwoo.notice_management.global.base;
 
 import lombok.Builder;
+import lombok.Getter;
 
-public abstract class ResponseAPI<T> {
+@Getter
+public final class ResponseAPI<T> {
     private T data;
     private String message;
     private int code;
@@ -21,8 +23,8 @@ public abstract class ResponseAPI<T> {
             .build();
     }
 
-    public static ResponseAPI<?> response(String message) {
-        return ResponseAPI.builder()
+    public static ResponseAPI<Void> response(String message) {
+        return ResponseAPI.<Void>builder()
             .message(message)
             .build();
     }
