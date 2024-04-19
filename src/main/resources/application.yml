@@ -5,11 +5,20 @@ spring:
     import: optional:file:.env[.properties]
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+
+  file:
+    save:
+      path: /Users/qwert/notice_management/
+
 
   datasource:
     url: jdbc:mysql://localhost:${LOCAL_MYSQL_PORT}/notice_management?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
