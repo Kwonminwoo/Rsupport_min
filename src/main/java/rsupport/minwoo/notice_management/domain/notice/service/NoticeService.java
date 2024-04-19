@@ -29,7 +29,8 @@ public class NoticeService {
     private final AttachedFileService attachedFileService;
 
     @Transactional
-    public void createNotice(CreateNoticeRequest createNoticeRequest, List<MultipartFile> attachedFileList) {
+    public void createNotice(CreateNoticeRequest createNoticeRequest,
+        List<MultipartFile> attachedFileList) {
         Member currentMember = memberRepository.findById(createNoticeRequest.getMemberId())
             .orElseThrow(RuntimeException::new);
 
@@ -54,7 +55,7 @@ public class NoticeService {
         Set<String> fileNames = new HashSet<>();
 
         for (MultipartFile file : fileList) {
-            if(fileNames.contains(file.getOriginalFilename())) {
+            if (fileNames.contains(file.getOriginalFilename())) {
                 throw new RuntimeException("중복된 파일 이름입니다.");
             }
             fileNames.add(file.getOriginalFilename());
@@ -80,6 +81,21 @@ public class NoticeService {
             .noticeResponseList(noticeResponseList)
             .totalPage(findNoticePage.getTotalPages())
             .totalCount(findNoticePage.getTotalElements())
+            .build();
+    }
+
+    @Transactional
+    public FindNoticeResponse findNotice(Long noticeId) {
+        Notice targetNotice = noticeRepository.findById(noticeId).orElseThrow(RuntimeException::new);
+
+        targetNotice.addView();
+
+        return FindNoticeResponse.builder()
+            .title(targetNotice.getTitle())
+            .content(targetNotice.getContent())
+            .postingDateTime(targetNotice.getCreatedAt())
+            .views(targetNotice.getViews())
+            .author(targetNotice.getMember().getName())
             .build();
     }
 }
