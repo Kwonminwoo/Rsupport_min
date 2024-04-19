@@ -16,8 +16,8 @@ public final class ResponseAPI<T> {
         this.code = code;
     }
 
-    public static ResponseAPI<?> response(Object data, String message) {
-        return ResponseAPI.builder()
+    public static <T> ResponseAPI<T> response(T data, String message) {
+        return ResponseAPI.<T>builder()
             .data(data)
             .message(message)
             .build();
@@ -30,8 +30,8 @@ public final class ResponseAPI<T> {
     }
 
 
-    public static ResponseAPI<?> response(Object data, String message, int code) {
-        return ResponseAPI.builder()
+    public static <T> ResponseAPI<T> response(T data, String message, int code) {
+        return ResponseAPI.<T>builder()
             .data(data)
             .message(message)
             .code(code)
