@@ -3,6 +3,7 @@ package rsupport.minwoo.notice_management.domain.attachedFile.service;
 import java.io.File;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,29 +22,34 @@ public class AttachedFileService {
     private final AttachedFileRepository attachedFileRepository;
 
     @Transactional
-    public void saveAttachedFile(Notice notice, MultipartFile file) {
+    public AttachedFile saveAttachedFile(Notice notice, MultipartFile file) {
         String saveFilePath = basePath + notice.getTitle() + "/";
-
         File saveDirectory = new File(saveFilePath);
-        if(!saveDirectory.exists()){
-            saveDirectory.mkdirs();
-        }
 
-        File saveFile = new File(saveDirectory, file.getOriginalFilename());
         try {
+            regenerateDirectory(saveDirectory);
+
+            File saveFile = new File(saveDirectory, file.getOriginalFilename());
             file.transferTo(saveFile);
         } catch (IOException e) {
             System.err.println(e);
             throw new RuntimeException("저장 실패");
         }
 
-        AttachedFile attachedFile = AttachedFile.builder()
+        AttachedFile saveFile = AttachedFile.builder()
             .title(file.getOriginalFilename())
             .type(file.getContentType())
             .notice(notice)
             .filePath(saveFilePath)
             .build();
 
-        attachedFileRepository.save(attachedFile);
+        notice.addAttachedFile(saveFile);
+
+        return saveFile;
+    }
+
+    private void regenerateDirectory(File directory) throws IOException {
+        FileUtils.cleanDirectory(directory);
+        directory.mkdirs();
     }
 }

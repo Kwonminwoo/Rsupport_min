@@ -15,6 +15,7 @@ import rsupport.minwoo.notice_management.domain.attachedFile.service.AttachedFil
 import rsupport.minwoo.notice_management.domain.member.entity.Member;
 import rsupport.minwoo.notice_management.domain.member.repository.MemberRepository;
 import rsupport.minwoo.notice_management.domain.notice.dto.request.CreateNoticeRequest;
+import rsupport.minwoo.notice_management.domain.notice.dto.request.UpdateNoticeRequest;
 import rsupport.minwoo.notice_management.domain.notice.dto.response.FindAllNoticeResponse;
 import rsupport.minwoo.notice_management.domain.notice.dto.response.FindNoticeResponse;
 import rsupport.minwoo.notice_management.domain.notice.entity.Notice;
@@ -102,5 +103,19 @@ public class NoticeService {
     @Transactional
     public void deleteNotice(Long noticeId) {
         noticeRepository.deleteById(noticeId);
+    }
+
+    @Transactional
+    public void updateNotice(Long noticeId, UpdateNoticeRequest updateNoticeRequest,
+        List<MultipartFile> attachedFileList) {
+
+        Notice targetNotice = noticeRepository.findById(noticeId)
+            .orElseThrow(RuntimeException::new);
+        targetNotice.update(updateNoticeRequest);
+
+        targetNotice.removeAllAttachedFile();
+        for (MultipartFile file : attachedFileList) {
+            attachedFileService.saveAttachedFile(targetNotice, file);
+        }
     }
 }
