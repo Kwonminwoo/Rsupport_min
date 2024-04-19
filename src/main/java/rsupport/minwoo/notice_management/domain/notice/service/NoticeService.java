@@ -98,4 +98,9 @@ public class NoticeService {
             .author(targetNotice.getMember().getName())
             .build();
     }
+
+    @Transactional
+    public void deleteNotice(Long noticeId) {
+        noticeRepository.deleteById(noticeId);
+    }
 }
