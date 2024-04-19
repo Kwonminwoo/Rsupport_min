@@ -2,14 +2,18 @@ package rsupport.minwoo.notice_management.domain.notice.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import rsupport.minwoo.notice_management.domain.notice.dto.CreateNoticeRequest;
+import rsupport.minwoo.notice_management.domain.notice.dto.request.CreateNoticeRequest;
+import rsupport.minwoo.notice_management.domain.notice.dto.response.FindAllNoticeResponse;
 import rsupport.minwoo.notice_management.domain.notice.service.NoticeService;
 import rsupport.minwoo.notice_management.global.base.ResponseAPI;
 
@@ -27,4 +31,13 @@ public class NoticeController {
 
         return ResponseEntity.ok(ResponseAPI.response("공지 생성 완료"));
     }
+
+    @GetMapping
+    public ResponseEntity<ResponseAPI<FindAllNoticeResponse>> findAllNotice(
+        @PageableDefault(size = 5) Pageable pageable) {
+
+        return ResponseEntity.ok(
+            ResponseAPI.response(noticeService.findAllNotice(pageable), "공지 전체 조회 완료"));
+    }
+
 }
