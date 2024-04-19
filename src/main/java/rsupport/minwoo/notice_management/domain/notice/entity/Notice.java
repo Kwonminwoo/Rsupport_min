@@ -7,12 +7,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+import rsupport.minwoo.notice_management.domain.attachedFile.entity.AttachedFile;
 import rsupport.minwoo.notice_management.domain.member.entity.Member;
 import rsupport.minwoo.notice_management.global.base.BaseEntity;
 
@@ -48,6 +52,9 @@ public class Notice extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @OneToMany(mappedBy = "notice", orphanRemoval = true)
+    private List<AttachedFile> fileList = new ArrayList<>();
 
     @Builder
     private Notice(Long id, String title, String content, LocalDateTime startDateTime,

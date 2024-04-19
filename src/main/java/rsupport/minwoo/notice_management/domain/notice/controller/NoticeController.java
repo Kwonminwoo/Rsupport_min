@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,6 +50,14 @@ public class NoticeController {
 
         return ResponseEntity.ok(
             ResponseAPI.response(noticeService.findNotice(noticeId), "공지 조회 완료"));
+    }
+
+    @DeleteMapping("/{notice_id}")
+    public ResponseEntity<ResponseAPI<Void>> deleteNotice(
+        @PathVariable("notice_id") Long noticeId) {
+
+        noticeService.deleteNotice(noticeId);
+        return ResponseEntity.ok(ResponseAPI.response("공지 삭제 완료"));
     }
 
 }
