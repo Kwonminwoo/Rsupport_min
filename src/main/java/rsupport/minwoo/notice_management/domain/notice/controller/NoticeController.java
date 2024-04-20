@@ -1,5 +1,6 @@
 package rsupport.minwoo.notice_management.domain.notice.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,7 @@ public class NoticeController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ResponseAPI<Void>> createNotice(
-        @RequestPart CreateNoticeRequest createNoticeRequest,
+        @Valid @RequestPart CreateNoticeRequest createNoticeRequest,
         @RequestPart List<MultipartFile> attachedFileList) {
         noticeService.createNotice(createNoticeRequest, attachedFileList);
 
@@ -67,7 +68,7 @@ public class NoticeController {
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
     )
     public ResponseEntity<ResponseAPI<Void>> updateNotice(
-        @PathVariable("notice_id") Long noticeId, @RequestPart UpdateNoticeRequest updateNoticeRequest,
+        @PathVariable("notice_id") Long noticeId, @Valid @RequestPart UpdateNoticeRequest updateNoticeRequest,
         @RequestPart List<MultipartFile> attachedFileList) {
 
         noticeService.updateNotice(noticeId, updateNoticeRequest, attachedFileList);

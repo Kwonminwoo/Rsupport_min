@@ -19,7 +19,10 @@ import rsupport.minwoo.notice_management.domain.notice.dto.request.UpdateNoticeR
 import rsupport.minwoo.notice_management.domain.notice.dto.response.FindAllNoticeResponse;
 import rsupport.minwoo.notice_management.domain.notice.dto.response.FindNoticeResponse;
 import rsupport.minwoo.notice_management.domain.notice.entity.Notice;
+import rsupport.minwoo.notice_management.domain.notice.exception.FileNameDuplicateException;
 import rsupport.minwoo.notice_management.domain.notice.repository.NoticeRepository;
+import rsupport.minwoo.notice_management.global.exception.DataNotFoundException;
+import rsupport.minwoo.notice_management.global.exception.ErrorCode;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +36,7 @@ public class NoticeService {
     public void createNotice(CreateNoticeRequest createNoticeRequest,
         List<MultipartFile> attachedFileList) {
         Member currentMember = memberRepository.findById(createNoticeRequest.getMemberId())
-            .orElseThrow(RuntimeException::new);
+            .orElseThrow(DataNotFoundException::new);
 
         Notice notice = Notice.builder()
             .title(createNoticeRequest.getTitle())
@@ -57,7 +60,7 @@ public class NoticeService {
 
         for (MultipartFile file : fileList) {
             if (fileNames.contains(file.getOriginalFilename())) {
-                throw new RuntimeException("중복된 파일 이름입니다.");
+                throw new FileNameDuplicateException(ErrorCode.DUPLICATE_FILE_NAME);
             }
             fileNames.add(file.getOriginalFilename());
         }
@@ -87,7 +90,8 @@ public class NoticeService {
 
     @Transactional
     public FindNoticeResponse findNotice(Long noticeId) {
-        Notice targetNotice = noticeRepository.findById(noticeId).orElseThrow(RuntimeException::new);
+        Notice targetNotice = noticeRepository.findById(noticeId)
+            .orElseThrow(DataNotFoundException::new);
 
         targetNotice.addView();
 
@@ -110,7 +114,7 @@ public class NoticeService {
         List<MultipartFile> attachedFileList) {
 
         Notice targetNotice = noticeRepository.findById(noticeId)
-            .orElseThrow(RuntimeException::new);
+            .orElseThrow(DataNotFoundException::new);
         targetNotice.update(updateNoticeRequest);
 
         targetNotice.removeAllAttachedFile();
