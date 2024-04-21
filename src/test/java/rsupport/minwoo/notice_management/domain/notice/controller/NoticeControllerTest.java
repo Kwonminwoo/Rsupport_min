@@ -2,24 +2,33 @@ package rsupport.minwoo.notice_management.domain.notice.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.awt.print.Pageable;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.convert.DataSizeUnit;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.jaxb.SpringDataJaxb.PageRequestDto;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import rsupport.minwoo.notice_management.domain.notice.dto.request.CreateNoticeRequest;
+import rsupport.minwoo.notice_management.domain.notice.dto.response.FindAllNoticeResponse;
+import rsupport.minwoo.notice_management.domain.notice.dto.response.FindNoticeResponse;
 import rsupport.minwoo.notice_management.domain.notice.service.NoticeService;
 
 @WebMvcTest(controllers = NoticeController.class)
@@ -33,7 +42,7 @@ class NoticeControllerTest {
     private NoticeService noticeService;
 
     @Nested
-    @DisplayName("공지 작성은")
+    @DisplayName("공지 생성은")
     class Context_createNotice {
 
         @Test
@@ -194,6 +203,48 @@ class NoticeControllerTest {
             resultActions
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", "시작일을 입력하세요").exists())
+                .andDo(print());
+        }
+    }
+
+    @Nested
+    @DisplayName("공지 전체 조회는")
+    class Context_findNotice {
+
+        @Test
+        @DisplayName("성공 시 공지 정보를 제공한다")
+        void _willSuccess() throws Exception{
+            // given
+            int pageSize = 5;
+            PageRequest pageRequest = PageRequest.of(0, pageSize);
+
+            List<FindNoticeResponse> noticeResponseList = List.of(FindNoticeResponse.builder()
+                .title("12월 행사 안내입니다.")
+                .content("12월달 행사를 안내합니다.")
+                .postingDateTime(LocalDateTime.now())
+                .views(200)
+                .author("tester")
+                .build());
+
+            int totalCount = noticeResponseList.size();
+
+            FindAllNoticeResponse findAllResponse = FindAllNoticeResponse.builder()
+                .noticeResponseList(noticeResponseList)
+                .totalPage(totalCount % pageSize)
+                .totalCount(totalCount)
+                .build();
+
+            when(noticeService.findAllNotice(any())).thenReturn(findAllResponse);
+
+            // when
+            ResultActions resultActions = mvc.perform(get("/api/notices")
+                .content(objectMapper.writeValueAsString(pageRequest))
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+            // then
+            resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.totalCount", totalCount).exists())
                 .andDo(print());
         }
     }
