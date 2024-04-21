@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,15 @@ public class CreateNoticeRequest {
     private LocalDateTime endDateTime;
     @NotNull(message = "회원 id가 필요합니다")
     private Long memberId;
+
+
+    @Builder
+    public CreateNoticeRequest(String title, String content, LocalDateTime startDateTime,
+        LocalDateTime endDateTime, Long memberId) {
+        this.title = title;
+        this.content = content;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.memberId = memberId;
+    }
 }
