@@ -20,6 +20,7 @@ import rsupport.minwoo.notice_management.domain.notice.dto.response.FindAllNotic
 import rsupport.minwoo.notice_management.domain.notice.dto.response.FindNoticeResponse;
 import rsupport.minwoo.notice_management.domain.notice.entity.Notice;
 import rsupport.minwoo.notice_management.domain.notice.exception.FileNameDuplicateException;
+import rsupport.minwoo.notice_management.domain.notice.exception.NoticeTitleDuplicateException;
 import rsupport.minwoo.notice_management.domain.notice.repository.NoticeRepository;
 import rsupport.minwoo.notice_management.global.exception.DataNotFoundException;
 import rsupport.minwoo.notice_management.global.exception.ErrorCode;
@@ -35,6 +36,9 @@ public class NoticeService {
     @Transactional
     public void createNotice(CreateNoticeRequest createNoticeRequest,
         List<MultipartFile> attachedFileList) {
+
+        validateDuplicateTitle(createNoticeRequest.getTitle());
+
         Member currentMember = memberRepository.findById(createNoticeRequest.getMemberId())
             .orElseThrow(DataNotFoundException::new);
 
@@ -52,6 +56,12 @@ public class NoticeService {
 
         for (MultipartFile file : attachedFileList) {
             attachedFileService.saveAttachedFile(notice, file);
+        }
+    }
+
+    private void validateDuplicateTitle(String noticeTitle) {
+        if(noticeRepository.findByTitle(noticeTitle).isPresent()) {
+            throw new NoticeTitleDuplicateException(ErrorCode.DUPLICATE_NOTICE_TITLE);
         }
     }
 

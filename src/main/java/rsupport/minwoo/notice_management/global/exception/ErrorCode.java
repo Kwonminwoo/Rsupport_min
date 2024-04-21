@@ -7,7 +7,8 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터를 찾을 수 없습니다."),
     FILE_SAVE_FAIL(HttpStatus.NOT_ACCEPTABLE, "파일을 저장할 수 없습니다."),
-    DUPLICATE_FILE_NAME(HttpStatus.CONFLICT, "파일명이 동일합니다.")
+    DUPLICATE_FILE_NAME(HttpStatus.CONFLICT, "파일명이 동일합니다."),
+    DUPLICATE_NOTICE_TITLE(HttpStatus.CONFLICT, "공지 제목이 겹칩니다."),
     ;
 
     private final HttpStatus httpStatus;
