@@ -281,7 +281,7 @@ class NoticeControllerTest {
     class Context_updateNotice {
 
         @Test
-        @DisplayName("성공 시 상태 메시지 204를 반환한다")
+        @DisplayName("성공 시 상태 메시지 200을 반환한다")
         void _willSuccess() throws Exception {
             // given
             doNothing().when(noticeService).deleteNotice(any());
@@ -291,7 +291,7 @@ class NoticeControllerTest {
 
             // then
             resultActions
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andDo(print());
         }
     }
