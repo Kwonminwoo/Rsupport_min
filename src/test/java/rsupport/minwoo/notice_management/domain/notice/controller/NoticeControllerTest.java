@@ -3,6 +3,7 @@ package rsupport.minwoo.notice_management.domain.notice.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -10,18 +11,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.awt.print.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.convert.DataSizeUnit;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.jaxb.SpringDataJaxb.PageRequestDto;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -47,7 +45,7 @@ class NoticeControllerTest {
 
         @Test
         @DisplayName("성공 시 상테 메시지 201을 반환한다.")
-        void _willSuccess () throws Exception {
+        void _willSuccess() throws Exception {
             // given
             Long memberId = 1L;
             CreateNoticeRequest createRequest = CreateNoticeRequest.builder()
@@ -209,11 +207,11 @@ class NoticeControllerTest {
 
     @Nested
     @DisplayName("공지 전체 조회는")
-    class Context_findNotice {
+    class Context_findAllNotice {
 
         @Test
-        @DisplayName("성공 시 공지 정보를 제공한다")
-        void _willSuccess() throws Exception{
+        @DisplayName("성공 시 공지 정보를 반환한다")
+        void _willSuccess() throws Exception {
             // given
             int pageSize = 5;
             PageRequest pageRequest = PageRequest.of(0, pageSize);
@@ -245,6 +243,55 @@ class NoticeControllerTest {
             resultActions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.totalCount", totalCount).exists())
+                .andDo(print());
+        }
+    }
+
+    @Nested
+    @DisplayName("공지 단건 조회는")
+    class Context_findNotice {
+
+        @Test
+        @DisplayName("성공 시 공지 정보를 반환한다.")
+        void _willSuccess() throws Exception {
+            // given
+            FindNoticeResponse response = FindNoticeResponse.builder()
+                .title("12월 행사 안내입니다.")
+                .content("12월달 행사를 안내합니다.")
+                .postingDateTime(LocalDateTime.now())
+                .views(200)
+                .author("tester")
+                .build();
+
+            when(noticeService.findNotice(any())).thenReturn(response);
+
+            // when
+            ResultActions resultActions = mvc.perform(get("/api/notices/{notice_id}", 1L));
+
+            // then
+            resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.title", response.getTitle()).exists())
+                .andDo(print());
+        }
+    }
+
+    @Nested
+    @DisplayName("공지 삭제는")
+    class Context_updateNotice {
+
+        @Test
+        @DisplayName("성공 시 상태 메시지 204를 반환한다")
+        void _willSuccess() throws Exception {
+            // given
+            doNothing().when(noticeService).deleteNotice(any());
+
+            // when
+            ResultActions resultActions = mvc.perform(delete("/api/notices/{notice_id}", 1L));
+
+            // then
+            resultActions
+                .andExpect(status().isNoContent())
                 .andDo(print());
         }
     }

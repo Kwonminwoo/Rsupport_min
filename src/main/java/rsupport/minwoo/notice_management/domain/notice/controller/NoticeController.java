@@ -61,20 +61,20 @@ public class NoticeController {
         @PathVariable("notice_id") Long noticeId) {
 
         noticeService.deleteNotice(noticeId);
-        return ResponseEntity.ok(ResponseAPI.response("공지 삭제 완료"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseAPI.response("공지 삭제 완료"));
     }
 
     @PutMapping(
         value = "/{notice_id}",
-        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
+        consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
     )
     public ResponseEntity<ResponseAPI<Void>> updateNotice(
         @PathVariable("notice_id") Long noticeId, @Valid @RequestPart UpdateNoticeRequest updateNoticeRequest,
-        @RequestPart List<MultipartFile> attachedFileList) {
+        @RequestPart(required = false) List<MultipartFile> attachedFileList) {
 
         noticeService.updateNotice(noticeId, updateNoticeRequest, attachedFileList);
 
-        return ResponseEntity.ok(ResponseAPI.response("수정에 성공했습니다."));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseAPI.response("수정에 성공했습니다."));
     }
 
 }
