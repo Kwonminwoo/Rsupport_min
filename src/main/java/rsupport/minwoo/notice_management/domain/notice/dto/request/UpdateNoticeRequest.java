@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,4 +19,13 @@ public class UpdateNoticeRequest {
     private LocalDateTime startDateTime;
     @NotNull(message = "종료일을 입력하세요")
     private LocalDateTime endDateTime;
+
+    @Builder
+    public UpdateNoticeRequest(String title, String content, LocalDateTime startDateTime,
+        LocalDateTime endDateTime) {
+        this.title = title;
+        this.content = content;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+    }
 }

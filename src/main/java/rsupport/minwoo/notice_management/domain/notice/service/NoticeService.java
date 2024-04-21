@@ -118,7 +118,6 @@ public class NoticeService {
     public void deleteNotice(Long noticeId) {
         Notice targetNotice = noticeRepository.findById(noticeId).orElseThrow(DataNotFoundException::new);
         noticeRepository.delete(targetNotice);
-        System.err.println(noticeId);
         attachedFileService.deleteAttachedFile(targetNotice.getTitle());
     }
 
