@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -22,4 +23,10 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     @Comment("이름")
     private String name;
+
+    @Builder
+    private Member(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }
