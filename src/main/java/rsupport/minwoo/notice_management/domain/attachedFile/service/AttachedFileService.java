@@ -21,8 +21,6 @@ public class AttachedFileService {
     @Value("${spring.file.save.path}")
     private String basePath;
 
-    private final AttachedFileRepository attachedFileRepository;
-
     @Transactional
     public AttachedFile saveAttachedFile(Notice notice, MultipartFile file) {
         String saveFilePath = basePath + notice.getTitle() + "/";
@@ -50,7 +48,9 @@ public class AttachedFileService {
     }
 
     private void regenerateDirectory(File directory) throws IOException {
-        FileUtils.cleanDirectory(directory);
+        if(directory.exists()){
+            FileUtils.cleanDirectory(directory);
+        }
         directory.mkdirs();
     }
 }

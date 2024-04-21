@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,13 +31,13 @@ public class NoticeController {
 
     private final NoticeService noticeService;
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ResponseAPI<Void>> createNotice(
         @Valid @RequestPart CreateNoticeRequest createNoticeRequest,
-        @RequestPart List<MultipartFile> attachedFileList) {
+        @RequestPart(required = false) List<MultipartFile> attachedFileList) {
         noticeService.createNotice(createNoticeRequest, attachedFileList);
 
-        return ResponseEntity.ok(ResponseAPI.response("공지 생성 완료"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseAPI.response("공지 생성 완료"));
     }
 
     @GetMapping
