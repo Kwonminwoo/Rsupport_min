@@ -116,12 +116,17 @@ public class NoticeService {
 
     @Transactional
     public void deleteNotice(Long noticeId) {
-        noticeRepository.deleteById(noticeId);
+        Notice targetNotice = noticeRepository.findById(noticeId).orElseThrow(DataNotFoundException::new);
+        noticeRepository.delete(targetNotice);
+        System.err.println(noticeId);
+        attachedFileService.deleteAttachedFile(targetNotice.getTitle());
     }
 
     @Transactional
     public void updateNotice(Long noticeId, UpdateNoticeRequest updateNoticeRequest,
         List<MultipartFile> attachedFileList) {
+
+        validateDuplicateTitle(updateNoticeRequest.getTitle());
 
         Notice targetNotice = noticeRepository.findById(noticeId)
             .orElseThrow(DataNotFoundException::new);

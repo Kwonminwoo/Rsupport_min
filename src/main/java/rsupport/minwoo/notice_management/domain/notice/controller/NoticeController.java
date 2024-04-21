@@ -61,7 +61,7 @@ public class NoticeController {
         @PathVariable("notice_id") Long noticeId) {
 
         noticeService.deleteNotice(noticeId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseAPI.response("공지 삭제 완료"));
+        return ResponseEntity.ok(ResponseAPI.response("공지 삭제 완료"));
     }
 
     @PutMapping(
@@ -74,7 +74,7 @@ public class NoticeController {
 
         noticeService.updateNotice(noticeId, updateNoticeRequest, attachedFileList);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseAPI.response("수정에 성공했습니다."));
+        return ResponseEntity.ok(ResponseAPI.response("수정에 성공했습니다."));
     }
 
 }
