@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import rsupport.minwoo.notice_management.domain.attachedFile.entity.AttachedFile;
+import rsupport.minwoo.notice_management.domain.attachedFile.exception.FileDeleteFailException;
 import rsupport.minwoo.notice_management.domain.attachedFile.exception.FileSaveFailException;
-import rsupport.minwoo.notice_management.domain.attachedFile.respository.AttachedFileRepository;
 import rsupport.minwoo.notice_management.domain.notice.entity.Notice;
 import rsupport.minwoo.notice_management.global.exception.ErrorCode;
 
@@ -52,5 +52,19 @@ public class AttachedFileService {
             FileUtils.cleanDirectory(directory);
         }
         directory.mkdirs();
+    }
+
+    public void deleteAttachedFile(String title) {
+        String targetFilePath = basePath + title + "/";
+        File targetFileDirectory = new File(targetFilePath);
+
+        if (targetFileDirectory.exists()) {
+            try {
+                FileUtils.cleanDirectory(targetFileDirectory);
+                targetFileDirectory.delete();
+            } catch (IOException e) {
+                throw new FileDeleteFailException(ErrorCode.FILE_DELETE_FAIL);
+            }
+        }
     }
 }
