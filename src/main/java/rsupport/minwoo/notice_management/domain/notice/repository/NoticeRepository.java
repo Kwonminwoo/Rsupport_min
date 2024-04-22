@@ -25,7 +25,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     @Modifying
     @Query("update Notice n set n.views = :views where n.id = :id")
-    void plusViewById(Long id, Long views);
+    void setViewById(Long id, Long views);
 
 
 }

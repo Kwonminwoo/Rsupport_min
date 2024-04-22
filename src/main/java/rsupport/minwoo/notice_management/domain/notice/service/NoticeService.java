@@ -109,7 +109,7 @@ public class NoticeService {
 
         noticeResponse.addViews();
 
-        noticeRepository.plusViewById(noticeId, noticeResponse.getViews());
+        noticeRepository.setViewById(noticeId, noticeResponse.getViews());
 
         return noticeResponse;
     }
