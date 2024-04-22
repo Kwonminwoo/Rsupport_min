@@ -125,10 +125,9 @@ public class NoticeService {
     @Transactional
     public void updateNotice(Long noticeId, UpdateNoticeRequest updateNoticeRequest,
         List<MultipartFile> attachedFileList) {
-
         validateDuplicateTitle(updateNoticeRequest.getTitle(), noticeId);
 
-        Notice targetNotice = noticeRepository.findById(noticeId)
+        Notice targetNotice = noticeRepository.findByIdWithFile(noticeId)
             .orElseThrow(DataNotFoundException::new);
         String beforeNoticeTitle = targetNotice.getTitle();
 

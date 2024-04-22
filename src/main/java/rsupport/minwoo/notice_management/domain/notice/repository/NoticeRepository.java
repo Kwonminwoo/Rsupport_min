@@ -27,5 +27,6 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     @Query("update Notice n set n.views = :views where n.id = :id")
     void setViewById(Long id, Long views);
 
-
+    @Query("select n from Notice n join fetch n.fileList where n.id = :id")
+    Optional<Notice> findByIdWithFile(Long id);
 }
