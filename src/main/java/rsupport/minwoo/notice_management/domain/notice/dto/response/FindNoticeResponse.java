@@ -7,11 +7,11 @@ import lombok.Getter;
 @Getter
 public class FindNoticeResponse {
 
-    private final String title;
-    private final String content;
-    private final LocalDateTime postingDateTime;
-    private final long views;
-    private final String author;
+    private String title;
+    private String content;
+    private LocalDateTime postingDateTime;
+    private long views;
+    private String author;
 
     @Builder
     public FindNoticeResponse(String title, String content, LocalDateTime postingDateTime,
@@ -22,5 +22,9 @@ public class FindNoticeResponse {
         this.postingDateTime = postingDateTime;
         this.views = views;
         this.author = author;
+    }
+
+    public void addViews() {
+        this.views++;
     }
 }
