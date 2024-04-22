@@ -54,9 +54,7 @@ public class NoticeService {
 
         validateDuplicateFileName(attachedFileList);
 
-        for (MultipartFile file : attachedFileList) {
-            attachedFileService.saveAttachedFile(notice, file);
-        }
+        attachedFileService.saveAttachedFile(notice, attachedFileList);
     }
 
     private void validateDuplicateTitle(String noticeTitle) {
@@ -132,8 +130,6 @@ public class NoticeService {
         targetNotice.update(updateNoticeRequest);
 
         targetNotice.removeAllAttachedFile();
-        for (MultipartFile file : attachedFileList) {
-            attachedFileService.saveAttachedFile(targetNotice, file);
-        }
+        attachedFileService.saveAttachedFile(targetNotice, attachedFileList);
     }
 }
