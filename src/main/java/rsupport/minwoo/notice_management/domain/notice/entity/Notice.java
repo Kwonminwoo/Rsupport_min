@@ -27,6 +27,7 @@ import rsupport.minwoo.notice_management.global.base.BaseEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notice extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Comment("공지사항 식별자")
@@ -58,7 +59,7 @@ public class Notice extends BaseEntity {
 
     @OneToMany(mappedBy = "notice", orphanRemoval = true)
     @Cascade(CascadeType.PERSIST)
-    private List<AttachedFile> fileList = new ArrayList<>();
+    private final List<AttachedFile> fileList = new ArrayList<>();
 
     @Builder
     private Notice(Long id, String title, String content, LocalDateTime startDateTime,

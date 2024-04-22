@@ -136,7 +136,7 @@ class NoticeServiceTest {
 
             // when & then
             Assertions.assertThatThrownBy(
-                () -> noticeService.createNotice(request, List.of(mockMultipartFile)))
+                    () -> noticeService.createNotice(request, List.of(mockMultipartFile)))
                 .isInstanceOf(NoticeTitleDuplicateException.class);
         }
 
@@ -216,7 +216,8 @@ class NoticeServiceTest {
 
             // when & then
             Assertions.assertThatThrownBy(
-                    () -> noticeService.createNotice(request, List.of(mockMultipartFile1, mockMultipartFile2)))
+                    () -> noticeService.createNotice(request,
+                        List.of(mockMultipartFile1, mockMultipartFile2)))
                 .isInstanceOf(FileNameDuplicateException.class);
         }
     }
@@ -394,7 +395,8 @@ class NoticeServiceTest {
 
             // when & then
             Assertions.assertThatThrownBy(
-                    () -> noticeService.updateNotice(notice.getId(), request, List.of(mockMultipartFile)))
+                    () -> noticeService.updateNotice(notice.getId(), request,
+                        List.of(mockMultipartFile)))
                 .isInstanceOf(DataNotFoundException.class);
         }
     }

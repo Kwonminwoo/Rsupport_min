@@ -69,7 +69,8 @@ public class NoticeController {
         consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
     )
     public ResponseEntity<ResponseAPI<Void>> updateNotice(
-        @PathVariable("notice_id") Long noticeId, @Valid @RequestPart UpdateNoticeRequest updateNoticeRequest,
+        @PathVariable("notice_id") Long noticeId,
+        @Valid @RequestPart UpdateNoticeRequest updateNoticeRequest,
         @RequestPart(required = false) List<MultipartFile> attachedFileList) {
 
         noticeService.updateNotice(noticeId, updateNoticeRequest, attachedFileList);
