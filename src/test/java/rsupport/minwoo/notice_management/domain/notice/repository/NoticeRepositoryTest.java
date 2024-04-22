@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
+import rsupport.minwoo.notice_management.domain.attachedFile.entity.AttachedFile;
 import rsupport.minwoo.notice_management.domain.member.entity.Member;
 import rsupport.minwoo.notice_management.domain.member.repository.MemberRepository;
 import rsupport.minwoo.notice_management.domain.notice.dto.response.FindNoticeResponse;
@@ -186,5 +187,43 @@ class NoticeRepositoryTest {
 
         //then
         Assertions.assertThat(foundNotice.getViews()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("findByIdWithFile() 는 공지와 파일을 반환한다.")
+    void _willSuccess_findByIdWithFile() {
+        // given
+        Member member = Member.builder()
+            .name("tester")
+            .build();
+
+        Member savedMember = memberRepository.save(member);
+
+        Notice notice = Notice.builder()
+            .title("테스트 공지입니다.")
+            .content("테스트입니다.")
+            .startDateTime(LocalDateTime.now())
+            .endDateTime(LocalDateTime.now().plusDays(30))
+            .member(savedMember)
+            .build();
+
+        AttachedFile file = AttachedFile.builder()
+            .notice(notice)
+            .title("test.png")
+            .filePath("/test")
+            .type("image/png")
+            .build();
+
+        notice.addAttachedFile(file);
+
+        noticeRepository.save(notice);
+
+        // when
+        Notice foundNotice = noticeRepository.findByIdWithFile(notice.getId())
+            .orElseThrow(RuntimeException::new);
+
+        //then
+        Assertions.assertThat(foundNotice.getFileList().size()).isEqualTo(1);
+        Assertions.assertThat(foundNotice.getFileList().get(0).getTitle()).isEqualTo(file.getTitle());
     }
 }

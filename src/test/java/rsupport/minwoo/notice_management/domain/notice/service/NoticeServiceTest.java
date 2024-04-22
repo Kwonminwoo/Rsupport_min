@@ -360,14 +360,14 @@ class NoticeServiceTest {
                 .build();
 
             given(noticeRepository.findByTitleNotThisNotice(any(), any())).willReturn(Optional.empty());
-            given(noticeRepository.findById(any())).willReturn(Optional.of(notice));
+            given(noticeRepository.findByIdWithFile(any())).willReturn(Optional.of(notice));
             doNothing().when(attachedFileService).updateAttachedFile(any(), any(), any());
 
             // when
             noticeService.updateNotice(notice.getId(), request, List.of(mockMultipartFile));
 
             // then
-            verify(noticeRepository, atLeastOnce()).findById(any());
+            verify(noticeRepository, atLeastOnce()).findByIdWithFile(any());
             verify(attachedFileService, atLeastOnce()).updateAttachedFile(any(), any(), any());
         }
 
@@ -400,7 +400,7 @@ class NoticeServiceTest {
                 .build();
 
             given(noticeRepository.findByTitleNotThisNotice(any(), any())).willReturn(Optional.empty());
-            given(noticeRepository.findById(any())).willReturn(Optional.empty());
+            given(noticeRepository.findByIdWithFile(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(
