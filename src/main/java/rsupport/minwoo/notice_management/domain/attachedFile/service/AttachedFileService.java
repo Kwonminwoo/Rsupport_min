@@ -26,9 +26,9 @@ public class AttachedFileService {
     @Transactional
     public void saveAttachedFile(Notice notice, List<MultipartFile> fileList) {
         String saveFilePath = basePath + notice.getTitle() + "/";
-        File saveDirectory = new File(saveFilePath);
+        File saveDirectory = getDirectoryFile(notice.getTitle());
         try {
-            regenerateDirectory(saveDirectory);
+            saveDirectory.mkdirs();
             for (MultipartFile file : fileList) {
 
                 File saveFile = new File(saveDirectory, file.getOriginalFilename());
@@ -48,16 +48,8 @@ public class AttachedFileService {
         }
     }
 
-    private void regenerateDirectory(File directory) throws IOException {
-        if (directory.exists()) {
-            FileUtils.cleanDirectory(directory);
-        }
-        directory.mkdirs();
-    }
-
     public void deleteAttachedFile(String title) {
-        String targetFilePath = basePath + title + "/";
-        File targetFileDirectory = new File(targetFilePath);
+        File targetFileDirectory = getDirectoryFile(title);
 
         if (targetFileDirectory.exists()) {
             try {
@@ -67,5 +59,18 @@ public class AttachedFileService {
                 throw new FileDeleteFailException(ErrorCode.FILE_DELETE_FAIL);
             }
         }
+    }
+
+    private File getDirectoryFile(String title) {
+        String targetFilePath = basePath + title + "/";
+        return new File(targetFilePath);
+    }
+
+    @Transactional
+    public void updateAttachedFile(String beforeNoticeTitle, Notice notice, List<MultipartFile> fileList) {
+        deleteAttachedFile(beforeNoticeTitle);
+        notice.removeAllAttachedFile();
+
+        saveAttachedFile(notice, fileList);
     }
 }

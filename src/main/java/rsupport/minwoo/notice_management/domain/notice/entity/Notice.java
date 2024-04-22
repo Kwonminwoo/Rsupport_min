@@ -81,10 +81,6 @@ public class Notice extends BaseEntity {
         this.fileList.clear();
     }
 
-    public void addView() {
-        this.views++;
-    }
-
     public void update(UpdateNoticeRequest request) {
         this.title = request.getTitle();
         this.content = request.getContent();

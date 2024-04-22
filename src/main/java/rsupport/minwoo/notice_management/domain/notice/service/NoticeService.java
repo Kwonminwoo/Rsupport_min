@@ -63,6 +63,12 @@ public class NoticeService {
         }
     }
 
+    private void validateDuplicateTitle(String noticeTitle, Long noticeId) {
+        if (noticeRepository.findByTitleNotThisNotice(noticeTitle, noticeId).isPresent()) {
+            throw new NoticeTitleDuplicateException(ErrorCode.DUPLICATE_NOTICE_TITLE);
+        }
+    }
+
     private void validateDuplicateFileName(List<MultipartFile> fileList) {
         Set<String> fileNames = new HashSet<>();
 
@@ -98,18 +104,14 @@ public class NoticeService {
 
     @Transactional
     public FindNoticeResponse findNotice(Long noticeId) {
-        Notice targetNotice = noticeRepository.findById(noticeId)
+        FindNoticeResponse noticeResponse = noticeRepository.findNoticeResponseById(noticeId)
             .orElseThrow(DataNotFoundException::new);
 
-        targetNotice.addView();
+        noticeResponse.addViews();
 
-        return FindNoticeResponse.builder()
-            .title(targetNotice.getTitle())
-            .content(targetNotice.getContent())
-            .postingDateTime(targetNotice.getCreatedAt())
-            .views(targetNotice.getViews())
-            .author(targetNotice.getMember().getName())
-            .build();
+        noticeRepository.plusViewById(noticeId, noticeResponse.getViews());
+
+        return noticeResponse;
     }
 
     @Transactional
@@ -124,13 +126,13 @@ public class NoticeService {
     public void updateNotice(Long noticeId, UpdateNoticeRequest updateNoticeRequest,
         List<MultipartFile> attachedFileList) {
 
-        validateDuplicateTitle(updateNoticeRequest.getTitle());
+        validateDuplicateTitle(updateNoticeRequest.getTitle(), noticeId);
 
         Notice targetNotice = noticeRepository.findById(noticeId)
             .orElseThrow(DataNotFoundException::new);
-        targetNotice.update(updateNoticeRequest);
+        String beforeNoticeTitle = targetNotice.getTitle();
 
-        targetNotice.removeAllAttachedFile();
-        attachedFileService.saveAttachedFile(targetNotice, attachedFileList);
+        targetNotice.update(updateNoticeRequest);
+        attachedFileService.updateAttachedFile(beforeNoticeTitle, targetNotice, attachedFileList);
     }
 }
