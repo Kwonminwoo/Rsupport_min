@@ -19,6 +19,10 @@ spring:
     save:
       path: /Users/qwert/notice_management/
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
   datasource:
     url: jdbc:mysql://localhost:${LOCAL_MYSQL_PORT}/notice_management?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true

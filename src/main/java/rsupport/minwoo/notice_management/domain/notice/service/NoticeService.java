@@ -3,6 +3,7 @@ package rsupport.minwoo.notice_management.domain.notice.service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import rsupport.minwoo.notice_management.domain.notice.dto.response.FindNoticeRe
 import rsupport.minwoo.notice_management.domain.notice.entity.Notice;
 import rsupport.minwoo.notice_management.domain.notice.exception.FileNameDuplicateException;
 import rsupport.minwoo.notice_management.domain.notice.exception.NoticeTitleDuplicateException;
+import rsupport.minwoo.notice_management.domain.notice.repository.NoticeRedisRepository;
 import rsupport.minwoo.notice_management.domain.notice.repository.NoticeRepository;
 import rsupport.minwoo.notice_management.global.exception.DataNotFoundException;
 import rsupport.minwoo.notice_management.global.exception.ErrorCode;
@@ -32,6 +34,7 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final MemberRepository memberRepository;
     private final AttachedFileService attachedFileService;
+    private final NoticeRedisRepository noticeRedisRepository;
 
     @Transactional
     public void createNotice(CreateNoticeRequest createNoticeRequest,
@@ -84,14 +87,23 @@ public class NoticeService {
         Page<Notice> findNoticePage = noticeRepository.findAll(pageable);
 
         List<FindNoticeResponse> noticeResponseList = findNoticePage.stream()
-            .map(n ->
-                FindNoticeResponse.builder()
+            .map(n -> {
+
+                Optional<FindNoticeResponse> savedNoticeOptional = noticeRedisRepository.getNoticeResponse(
+                    n.getId());
+                long views = n.getViews();
+                if(savedNoticeOptional.isPresent()){
+                    views = savedNoticeOptional.get().getViews();
+                }
+
+                return FindNoticeResponse.builder()
                     .title(n.getTitle())
                     .content(n.getContent())
                     .postingDateTime(n.getCreatedAt())
-                    .views(n.getViews())
+                    .views(views)
                     .author(n.getMember().getName())
-                    .build()
+                    .build();
+                }
             )
             .collect(Collectors.toList());
 
@@ -104,12 +116,17 @@ public class NoticeService {
 
     @Transactional
     public FindNoticeResponse findNotice(Long noticeId) {
-        FindNoticeResponse noticeResponse = noticeRepository.findNoticeResponseById(noticeId)
-            .orElseThrow(DataNotFoundException::new);
+        FindNoticeResponse noticeResponse = noticeRedisRepository.getNoticeResponse(noticeId)
+            .orElseGet(() -> {
+                FindNoticeResponse response = noticeRepository.findNoticeResponseById(noticeId)
+                    .orElseThrow(DataNotFoundException::new);
+                noticeRedisRepository.setNoticeResponse(response, noticeId);
+
+                return response;
+            });
 
         noticeResponse.addViews();
-
-        noticeRepository.setViewById(noticeId, noticeResponse.getViews());
+        noticeRedisRepository.incrementView(noticeId);
 
         return noticeResponse;
     }
@@ -120,6 +137,7 @@ public class NoticeService {
             .orElseThrow(DataNotFoundException::new);
         noticeRepository.delete(targetNotice);
         attachedFileService.deleteAttachedFile(targetNotice.getTitle());
+        noticeRedisRepository.deleteNoticeResponse(noticeId);
     }
 
     @Transactional
@@ -132,6 +150,12 @@ public class NoticeService {
         String beforeNoticeTitle = targetNotice.getTitle();
 
         targetNotice.update(updateNoticeRequest);
+
+        FindNoticeResponse savedNoticeResponse = noticeRedisRepository.getNoticeResponse(noticeId)
+            .orElseThrow(DataNotFoundException::new);
+        noticeRepository.setViewById(noticeId, savedNoticeResponse.getViews());
+
         attachedFileService.updateAttachedFile(beforeNoticeTitle, targetNotice, attachedFileList);
+        noticeRedisRepository.deleteNoticeResponse(noticeId);
     }
 }
