@@ -33,6 +33,7 @@ import rsupport.minwoo.notice_management.domain.notice.dto.response.FindNoticeRe
 import rsupport.minwoo.notice_management.domain.notice.entity.Notice;
 import rsupport.minwoo.notice_management.domain.notice.exception.FileNameDuplicateException;
 import rsupport.minwoo.notice_management.domain.notice.exception.NoticeTitleDuplicateException;
+import rsupport.minwoo.notice_management.domain.notice.repository.NoticeRedisRepository;
 import rsupport.minwoo.notice_management.domain.notice.repository.NoticeRepository;
 import rsupport.minwoo.notice_management.global.exception.DataNotFoundException;
 
@@ -47,6 +48,9 @@ class NoticeServiceTest {
     private MemberRepository memberRepository;
     @Mock
     private AttachedFileService attachedFileService;
+
+    @Mock
+    private NoticeRedisRepository noticeRedisRepository;
 
     @Nested
     @DisplayName("공지 생성은 ")
@@ -361,6 +365,7 @@ class NoticeServiceTest {
 
             given(noticeRepository.findByTitleNotThisNotice(any(), any())).willReturn(Optional.empty());
             given(noticeRepository.findByIdWithFile(any())).willReturn(Optional.of(notice));
+            given(noticeRedisRepository.getNoticeResponse(any())).willReturn(Optional.empty());
             doNothing().when(attachedFileService).updateAttachedFile(any(), any(), any());
 
             // when
@@ -432,9 +437,10 @@ class NoticeServiceTest {
                 .endDateTime(LocalDateTime.now().plusDays(30))
                 .build();
 
-            given(noticeRepository.findById(any())).willReturn(Optional.of(notice));
+            given(noticeRepository.findByIdWithFile(any())).willReturn(Optional.of(notice));
             doNothing().when(noticeRepository).delete(any());
             doNothing().when(attachedFileService).deleteAttachedFile(any());
+            doNothing().when(noticeRedisRepository).deleteNoticeResponse(any());
 
             // when
             noticeService.deleteNotice(notice.getId());
