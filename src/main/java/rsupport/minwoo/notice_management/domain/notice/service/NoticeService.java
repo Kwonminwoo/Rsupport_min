@@ -150,10 +150,11 @@ public class NoticeService {
         String beforeNoticeTitle = targetNotice.getTitle();
 
         targetNotice.update(updateNoticeRequest);
-
-        FindNoticeResponse savedNoticeResponse = noticeRedisRepository.getNoticeResponse(noticeId)
-            .orElseThrow(DataNotFoundException::new);
-        noticeRepository.setViewById(noticeId, savedNoticeResponse.getViews());
+        Optional<FindNoticeResponse> savedRedisNoticeOptional = noticeRedisRepository.getNoticeResponse(
+            noticeId);
+        if(savedRedisNoticeOptional.isPresent()){
+            noticeRepository.setViewById(noticeId, savedRedisNoticeOptional.get().getViews());
+        }
 
         attachedFileService.updateAttachedFile(beforeNoticeTitle, targetNotice, attachedFileList);
         noticeRedisRepository.deleteNoticeResponse(noticeId);
