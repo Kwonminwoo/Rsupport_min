@@ -116,7 +116,7 @@ public class NoticeService {
 
     @Transactional
     public void deleteNotice(Long noticeId) {
-        Notice targetNotice = noticeRepository.findById(noticeId)
+        Notice targetNotice = noticeRepository.findByIdWithFile(noticeId)
             .orElseThrow(DataNotFoundException::new);
         noticeRepository.delete(targetNotice);
         attachedFileService.deleteAttachedFile(targetNotice.getTitle());
