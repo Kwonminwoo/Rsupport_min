@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Comment;
-import org.springframework.transaction.annotation.Transactional;
 import rsupport.minwoo.notice_management.domain.attachedFile.entity.AttachedFile;
 import rsupport.minwoo.notice_management.domain.member.entity.Member;
 import rsupport.minwoo.notice_management.domain.notice.dto.request.UpdateNoticeRequest;
@@ -33,38 +32,31 @@ import rsupport.minwoo.notice_management.global.base.BaseEntity;
 @Table(indexes = @Index(name = "idx_title", columnList = "title"))
 public class Notice extends BaseEntity {
 
+    @OneToMany(mappedBy = "notice", orphanRemoval = true)
+    @Cascade(CascadeType.PERSIST)
+    private final List<AttachedFile> fileList = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Comment("공지사항 식별자")
     private Long id;
-
     @Column(nullable = false, length = 50)
     @Comment("제목")
     private String title;
-
     @Column(nullable = false, columnDefinition = "TEXT")
     @Comment("내용")
     private String content;
-
     @Column(nullable = false)
     @Comment("시작 일시")
     private LocalDateTime startDateTime;
-
     @Column(nullable = false)
     @Comment("종료 일시")
     private LocalDateTime endDateTime;
-
     @Column(nullable = false, updatable = false)
     @Comment("조회수")
     private long views;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false, updatable = false)
     private Member member;
-
-    @OneToMany(mappedBy = "notice", orphanRemoval = true)
-    @Cascade(CascadeType.PERSIST)
-    private final List<AttachedFile> fileList = new ArrayList<>();
 
     @Builder
     private Notice(Long id, String title, String content, LocalDateTime startDateTime,

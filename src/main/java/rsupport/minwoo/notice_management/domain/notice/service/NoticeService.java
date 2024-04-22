@@ -89,20 +89,20 @@ public class NoticeService {
         List<FindNoticeResponse> noticeResponseList = findNoticePage.stream()
             .map(n -> {
 
-                Optional<FindNoticeResponse> savedNoticeOptional = noticeRedisRepository.getNoticeResponse(
-                    n.getId());
-                long views = n.getViews();
-                if(savedNoticeOptional.isPresent()){
-                    views = savedNoticeOptional.get().getViews();
-                }
+                    Optional<FindNoticeResponse> savedNoticeOptional = noticeRedisRepository.getNoticeResponse(
+                        n.getId());
+                    long views = n.getViews();
+                    if (savedNoticeOptional.isPresent()) {
+                        views = savedNoticeOptional.get().getViews();
+                    }
 
-                return FindNoticeResponse.builder()
-                    .title(n.getTitle())
-                    .content(n.getContent())
-                    .postingDateTime(n.getCreatedAt())
-                    .views(views)
-                    .author(n.getMember().getName())
-                    .build();
+                    return FindNoticeResponse.builder()
+                        .title(n.getTitle())
+                        .content(n.getContent())
+                        .postingDateTime(n.getCreatedAt())
+                        .views(views)
+                        .author(n.getMember().getName())
+                        .build();
                 }
             )
             .collect(Collectors.toList());
@@ -152,7 +152,7 @@ public class NoticeService {
         targetNotice.update(updateNoticeRequest);
         Optional<FindNoticeResponse> savedRedisNoticeOptional = noticeRedisRepository.getNoticeResponse(
             noticeId);
-        if(savedRedisNoticeOptional.isPresent()){
+        if (savedRedisNoticeOptional.isPresent()) {
             noticeRepository.setViewById(noticeId, savedRedisNoticeOptional.get().getViews());
         }
 

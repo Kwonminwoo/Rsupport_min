@@ -26,7 +26,8 @@ public class RedisConfig {
         RedisTemplate<String, FindNoticeResponse> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(FindNoticeResponse.class));
+        redisTemplate.setValueSerializer(
+            new Jackson2JsonRedisSerializer<>(FindNoticeResponse.class));
 
         return redisTemplate;
     }

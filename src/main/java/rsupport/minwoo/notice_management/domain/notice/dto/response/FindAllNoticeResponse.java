@@ -7,9 +7,9 @@ import lombok.Getter;
 @Getter
 public class FindAllNoticeResponse {
 
-    private List<FindNoticeResponse> noticeResponseList;
-    private int totalPage;
-    private long totalCount;
+    private final List<FindNoticeResponse> noticeResponseList;
+    private final int totalPage;
+    private final long totalCount;
 
     @Builder
     public FindAllNoticeResponse(List<FindNoticeResponse> noticeResponseList, int totalPage,
