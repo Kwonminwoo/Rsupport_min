@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class UpdateNoticeRequest {
+
     @NotBlank(message = "제목은 빈 값일 수 없습니다.")
     private String title;
     @NotEmpty(message = "내용에 값을 입력하세요")

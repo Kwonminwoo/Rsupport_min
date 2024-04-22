@@ -5,9 +5,10 @@ import lombok.Getter;
 
 @Getter
 public final class ResponseAPI<T> {
-    private T data;
-    private String message;
-    private int code;
+
+    private final T data;
+    private final String message;
+    private final int code;
 
     @Builder
     private ResponseAPI(T data, String message, int code) {

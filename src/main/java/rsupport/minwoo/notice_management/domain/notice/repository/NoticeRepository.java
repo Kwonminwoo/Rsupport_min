@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import rsupport.minwoo.notice_management.domain.notice.entity.Notice;
 
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
+
     Page<Notice> findAll(Pageable pageable);
 
     Optional<Notice> findByTitle(String title);

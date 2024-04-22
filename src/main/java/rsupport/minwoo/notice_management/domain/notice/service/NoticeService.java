@@ -58,7 +58,7 @@ public class NoticeService {
     }
 
     private void validateDuplicateTitle(String noticeTitle) {
-        if(noticeRepository.findByTitle(noticeTitle).isPresent()) {
+        if (noticeRepository.findByTitle(noticeTitle).isPresent()) {
             throw new NoticeTitleDuplicateException(ErrorCode.DUPLICATE_NOTICE_TITLE);
         }
     }
@@ -114,7 +114,8 @@ public class NoticeService {
 
     @Transactional
     public void deleteNotice(Long noticeId) {
-        Notice targetNotice = noticeRepository.findById(noticeId).orElseThrow(DataNotFoundException::new);
+        Notice targetNotice = noticeRepository.findById(noticeId)
+            .orElseThrow(DataNotFoundException::new);
         noticeRepository.delete(targetNotice);
         attachedFileService.deleteAttachedFile(targetNotice.getTitle());
     }
