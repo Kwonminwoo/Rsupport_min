@@ -281,7 +281,16 @@ class NoticeServiceTest {
                 .endDateTime(LocalDateTime.now().plusDays(30))
                 .build();
 
-            given(noticeRepository.findById(any())).willReturn(Optional.of(notice));
+            FindNoticeResponse findNoticeResponse = FindNoticeResponse.builder()
+                .title(notice.getTitle())
+                .content(notice.getContent())
+                .postingDateTime(LocalDateTime.now())
+                .views(0)
+                .author(member.getName())
+                .build();
+
+            given(noticeRepository.findNoticeResponseById(any())).willReturn(
+                Optional.of(findNoticeResponse));
 
             // when
             FindNoticeResponse result = noticeService.findNotice(notice.getId());
@@ -309,7 +318,7 @@ class NoticeServiceTest {
                 .endDateTime(LocalDateTime.now().plusDays(30))
                 .build();
 
-            given(noticeRepository.findById(any())).willReturn(Optional.empty());
+            given(noticeRepository.findNoticeResponseById(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(
@@ -350,16 +359,16 @@ class NoticeServiceTest {
                 .endDateTime(notice.getEndDateTime())
                 .build();
 
-            given(noticeRepository.findByTitle(any())).willReturn(Optional.empty());
-            given(noticeRepository.findById(any())).willReturn(Optional.of(notice));
-            doNothing().when(attachedFileService).saveAttachedFile(any(), any());
+            given(noticeRepository.findByTitleNotThisNotice(any(), any())).willReturn(Optional.empty());
+            given(noticeRepository.findByIdWithFile(any())).willReturn(Optional.of(notice));
+            doNothing().when(attachedFileService).updateAttachedFile(any(), any(), any());
 
             // when
             noticeService.updateNotice(notice.getId(), request, List.of(mockMultipartFile));
 
             // then
-            verify(noticeRepository, atLeastOnce()).findById(any());
-            verify(attachedFileService, atLeastOnce()).saveAttachedFile(any(), any());
+            verify(noticeRepository, atLeastOnce()).findByIdWithFile(any());
+            verify(attachedFileService, atLeastOnce()).updateAttachedFile(any(), any(), any());
         }
 
         @Test
@@ -390,8 +399,8 @@ class NoticeServiceTest {
                 .endDateTime(notice.getEndDateTime())
                 .build();
 
-            given(noticeRepository.findByTitle(any())).willReturn(Optional.empty());
-            given(noticeRepository.findById(any())).willReturn(Optional.empty());
+            given(noticeRepository.findByTitleNotThisNotice(any(), any())).willReturn(Optional.empty());
+            given(noticeRepository.findByIdWithFile(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(
