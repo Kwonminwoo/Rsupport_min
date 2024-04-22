@@ -2,7 +2,7 @@ package rsupport.minwoo.notice_management.domain.attachedFile.service;
 
 import java.io.File;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,41 +14,42 @@ import rsupport.minwoo.notice_management.domain.attachedFile.exception.FileSaveF
 import rsupport.minwoo.notice_management.domain.notice.entity.Notice;
 import rsupport.minwoo.notice_management.global.exception.ErrorCode;
 
-@RequiredArgsConstructor
 @Service
 public class AttachedFileService {
 
-    @Value("${spring.file.save.path}")
-    private String basePath;
+    private final String basePath;
+
+    public AttachedFileService(@Value("${spring.file.save.path}") String basePath) {
+        this.basePath = basePath;
+    }
 
     @Transactional
-    public AttachedFile saveAttachedFile(Notice notice, MultipartFile file) {
+    public void saveAttachedFile(Notice notice, List<MultipartFile> fileList) {
         String saveFilePath = basePath + notice.getTitle() + "/";
         File saveDirectory = new File(saveFilePath);
-
         try {
             regenerateDirectory(saveDirectory);
+            for (MultipartFile file : fileList) {
 
-            File saveFile = new File(saveDirectory, file.getOriginalFilename());
-            file.transferTo(saveFile);
+                File saveFile = new File(saveDirectory, file.getOriginalFilename());
+                file.transferTo(saveFile);
+
+                notice.addAttachedFile(
+                    AttachedFile.builder()
+                        .title(file.getOriginalFilename())
+                        .type(file.getContentType())
+                        .notice(notice)
+                        .filePath(saveFilePath)
+                        .build()
+                );
+            }
         } catch (IOException e) {
             throw new FileSaveFailException(ErrorCode.FILE_SAVE_FAIL);
         }
-
-        AttachedFile saveFile = AttachedFile.builder()
-            .title(file.getOriginalFilename())
-            .type(file.getContentType())
-            .notice(notice)
-            .filePath(saveFilePath)
-            .build();
-
-        notice.addAttachedFile(saveFile);
-
-        return saveFile;
     }
 
     private void regenerateDirectory(File directory) throws IOException {
-        if(directory.exists()){
+        if (directory.exists()) {
             FileUtils.cleanDirectory(directory);
         }
         directory.mkdirs();
