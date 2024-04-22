@@ -1,11 +1,9 @@
 package rsupport.minwoo.notice_management.domain.notice.service;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
@@ -19,15 +17,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.convert.DataSizeUnit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
-import rsupport.minwoo.notice_management.domain.attachedFile.entity.AttachedFile;
 import rsupport.minwoo.notice_management.domain.attachedFile.service.AttachedFileService;
 import rsupport.minwoo.notice_management.domain.member.entity.Member;
 import rsupport.minwoo.notice_management.domain.member.repository.MemberRepository;
@@ -78,13 +73,6 @@ class NoticeServiceTest {
             MockMultipartFile mockMultipartFile = new MockMultipartFile("attachedFileList",
                 "test.txt", MediaType.TEXT_PLAIN_VALUE, "test".getBytes());
 
-            AttachedFile attachedFile = AttachedFile.builder()
-                .notice(notice)
-                .title(mockMultipartFile.getOriginalFilename())
-                .filePath("test")
-                .type(mockMultipartFile.getContentType())
-                .build();
-
             CreateNoticeRequest request = CreateNoticeRequest.builder()
                 .title(notice.getTitle())
                 .content(notice.getContent())
@@ -96,7 +84,7 @@ class NoticeServiceTest {
             given(noticeRepository.findByTitle(any())).willReturn(Optional.empty());
             given(memberRepository.findById(any())).willReturn(Optional.of(member));
             given(noticeRepository.save(any())).willReturn(notice);
-            given(attachedFileService.saveAttachedFile(any(), any())).willReturn(attachedFile);
+            doNothing().when(attachedFileService).saveAttachedFile(any(), any());
 
             // when
             noticeService.createNotice(request, List.of(mockMultipartFile));
@@ -354,13 +342,6 @@ class NoticeServiceTest {
             MockMultipartFile mockMultipartFile = new MockMultipartFile("attachedFileList",
                 "test.txt", MediaType.TEXT_PLAIN_VALUE, "test".getBytes());
 
-            AttachedFile attachedFile = AttachedFile.builder()
-                .notice(notice)
-                .title(mockMultipartFile.getOriginalFilename())
-                .filePath("test")
-                .type(mockMultipartFile.getContentType())
-                .build();
-
             UpdateNoticeRequest request = UpdateNoticeRequest.builder()
                 .title("새로운 제목입니다.")
                 .content(notice.getContent())
@@ -370,7 +351,7 @@ class NoticeServiceTest {
 
             given(noticeRepository.findByTitle(any())).willReturn(Optional.empty());
             given(noticeRepository.findById(any())).willReturn(Optional.of(notice));
-            given(attachedFileService.saveAttachedFile(any(), any())).willReturn(attachedFile);
+            doNothing().when(attachedFileService).saveAttachedFile(any(), any());
 
             // when
             noticeService.updateNotice(notice.getId(), request, List.of(mockMultipartFile));
