@@ -61,7 +61,7 @@ class AttachedFileServiceTest {
     }
 
     @Nested
-    @DisplayName("첨푸바일 삭제는 ")
+    @DisplayName("첨부 파일 삭제는 ")
     class Context_attachedFileDelete {
 
         @Test

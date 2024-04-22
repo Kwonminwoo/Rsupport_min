@@ -19,8 +19,9 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     @Query("select n from Notice n where n.title = :title and n.id != :noticeId")
     Optional<Notice> findByTitleNotThisNotice(String title, Long noticeId);
 
-    @Query("select new rsupport.minwoo.notice_management.domain.notice.dto.response.FindNoticeResponse("
-        + "n.title, n.content, n.createdAt, n.views, n.member.name) from Notice n where n.id = :id")
+    @Query(
+        "select new rsupport.minwoo.notice_management.domain.notice.dto.response.FindNoticeResponse("
+            + "n.title, n.content, n.createdAt, n.views, n.member.name) from Notice n where n.id = :id")
     Optional<FindNoticeResponse> findNoticeResponseById(Long id);
 
     @Modifying

@@ -67,7 +67,8 @@ public class AttachedFileService {
     }
 
     @Transactional
-    public void updateAttachedFile(String beforeNoticeTitle, Notice notice, List<MultipartFile> fileList) {
+    public void updateAttachedFile(String beforeNoticeTitle, Notice notice,
+        List<MultipartFile> fileList) {
         deleteAttachedFile(beforeNoticeTitle);
         notice.removeAllAttachedFile();
 
